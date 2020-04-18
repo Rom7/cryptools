@@ -59,6 +59,7 @@ def read_pubkey_from_file(path_cert):
 
 # extended euclidian algorithm - iterative version adaptedfrom wikibooks
 def egcd(a, b): 
+	a,b = int(a),int(b)
 	"""return (g, x, y) such that a*x + b*y = g = gcd(a, b)"""
 	x0, x1, y0, y1 = 0, 1, 1, 0
 	while a != 0:
@@ -74,26 +75,27 @@ def coprimes(a,b):
 		return False
 
 def modinv(a, m):
-    g, x, y = egcd(a, m)
-    if g != 1:
-        raise ValueError('Modular inverse of {} in base {} does not exist.'.format(a,m))
-        exit()
-    else:
-        return x % m
+	a,m = int(a),int(m)
+	g, x, y = egcd(a, m)
+	if g != 1:
+		raise ValueError('Modular inverse of {} in base {} does not exist.'.format(a,m))
+		exit()
+	else:
+		return x % m
 
 # adapted from https://www.geeksforgeeks.org/find-number-co-prime-pairs-array/
 # not optimized at all :)
 def check_coprimes_all(arr, n) :
     for i in range(0, n-1) : 
         for j in range(i+1, n) : 
-            if not(coprimes(arr[i], arr[j])) : 
+            if not(coprimes(arr[i], arr[j])): 
                 return False
     return True 
 
 def compute_Mis(glob_M,array_mod):
 	array_Mis = []
 	for n in array_mod:
-		array_Mis.append(glob_M//n)
+		array_Mis.append(glob_M//int(n))
 	return array_Mis
 
 def compute_modular_inverses(array_Mis,array_mod):
@@ -105,7 +107,7 @@ def compute_modular_inverses(array_Mis,array_mod):
 def compute_global_congruence(array_congr,array_Mis,array_modinv):
 	K = 0
 	for i,Mis in enumerate(array_Mis):
-		K = K+(array_congr[i]*Mis*array_modinv[i])
+		K = K+(int(array_congr[i])*int(Mis)*int(array_modinv[i]))
 	return K
 
 def file_mode():
@@ -138,13 +140,13 @@ def main():
 		print("Modulus integer set must be pairwise coprime")
 		exit()
 
-	M = functools.reduce(lambda x,y : x*y, array_mod)
+	M = functools.reduce(lambda x,y : int(x)*int(y), array_mod)
 	Mis = compute_Mis(M, array_mod)
 	Yis = compute_modular_inverses(Mis,array_mod)
 
 	K = compute_global_congruence(array_congr,Mis,Yis)%M
 
-	print("\n x is congruent to {} mod {}".format(K,M))
+	print("\n x is congruent to {} \nmod {}".format(K,M))
 
 	if args.files:
 		K_great = gmpy.mpz(K)
@@ -155,6 +157,7 @@ def main():
 
 		Solution = int(main_root[0])
 		print("\n Decrypted m integer value : {}".format(Solution))
+		print("\n Possible cleartext value : ")
 		print(libnum.n2s(Solution))
 
 
